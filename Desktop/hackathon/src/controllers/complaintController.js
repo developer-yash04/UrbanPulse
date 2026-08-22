@@ -1,106 +1,59 @@
-const supabase = require('../lib/supabase');
+const supabase = require('../lib/supabase'); // Ensure this points to your Supabase connection file
 
-// Submit complaint (Handles photo upload to Supabase Storage)
 const createComplaint = async (req, res) => {
   try {
+    // 1. Grab text data sent by the frontend
     const { user_id, description, category, priority, latitude, longitude } = req.body;
+    
     let imageUrl = null;
 
+    // 2. Handle the Image (Multer intercepted this for us!)
     if (req.file) {
-      const fileName = `${Date.now()}-${req.file.originalname.replace(/\s+/g, '-')}`;
-      const { error: uploadError } = await supabase.storage
-        .from('complaint-images')
-        .upload(fileName, req.file.buffer, { contentType: req.file.mimetype });
+      const fileName = `${Date.now()}-${req.file.originalname}`;
+      
+      // Upload raw buffer to Supabase Storage bucket named 'complaints'
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('complaints') 
+        .upload(fileName, req.file.buffer, {
+          contentType: req.file.mimetype,
+        });
 
       if (uploadError) throw uploadError;
 
+      // Get the public URL to save in the database
       const { data: publicUrlData } = supabase.storage
-        .from('complaint-images').getPublicUrl(fileName);
+        .from('complaints')
+        .getPublicUrl(fileName);
+        
       imageUrl = publicUrlData.publicUrl;
     }
 
+    // 3. Insert all data into your 'complaints' SQL table
     const { data, error } = await supabase
       .from('complaints')
-      .insert([{
-        user_id: user_id || 'anonymous',
-        description,
-        category,
-        priority: priority || 'Medium',
-        status: 'Submitted',
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-        image_url: imageUrl,
-        upvotes: 0
-      }])
-      .select()
-      .single();
+      .insert([
+        {
+          user_id: user_id || 'anonymous',
+          description,
+          category,
+          priority,
+          latitude: parseFloat(latitude),
+          longitude: parseFloat(longitude),
+          image_url: imageUrl,
+          status: 'Submitted'
+        }
+      ])
+      .select(); // Returns the newly created row
 
     if (error) throw error;
-    res.status(201).json({ success: true, data });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+
+    // 4. Send success response back to frontend
+    res.status(201).json({ success: true, data: data[0] });
+
+  } catch (error) {
+    console.error('Error creating complaint:', error);
+    res.status(500).json({ success: false, message: 'Failed to submit complaint' });
   }
 };
 
-// Fetch complaints (For Admin Dashboard & Map)
-const getComplaints = async (req, res) => {
-  try {
-    const { category, priority, status } = req.query;
-    
-    let query = supabase.from('complaints').select('*')
-      .order('upvotes', { ascending: false })
-      .order('created_at', { ascending: false });
-
-    if (category) query = query.eq('category', category);
-    if (priority) query = query.eq('priority', priority);
-    if (status) query = query.eq('status', status);
-
-    const { data, error } = await query;
-    if (error) throw error;
-    res.status(200).json({ success: true, count: data.length, data });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-// Upvote existing complaint (Duplicate reporting alternative)
-const upvoteComplaint = async (req, res) => {
-  try {
-    const { id } = req.params;
-    
-    // 1. Get current count
-    const { data: current, error: fetchErr } = await supabase
-      .from('complaints').select('upvotes').eq('id', id).single();
-    if (fetchErr) throw fetchErr;
-
-    // 2. Increment
-    const { data, error } = await supabase
-      .from('complaints')
-      .update({ upvotes: current.upvotes + 1 })
-      .eq('id', id)
-      .select().single();
-      
-    if (error) throw error;
-    res.status(200).json({ success: true, upvotes: data.upvotes });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-// Change status (Authority updates: Submitted -> Under Review -> Resolved)
-const updateStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    const { data, error } = await supabase
-      .from('complaints').update({ status }).eq('id', id).select().single();
-      
-    if (error) throw error;
-    res.status(200).json({ success: true, data });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
-};
-
-module.exports = { createComplaint, getComplaints, upvoteComplaint, updateStatus };
+module.exports = { createComplaint };

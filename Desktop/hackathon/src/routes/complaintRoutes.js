@@ -7,8 +7,8 @@ const { createComplaint, getComplaints, upvoteComplaint, updateStatus } = requir
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post('/', upload.single('photo'), createComplaint);
-router.get('/', getComplaints);
-router.patch('/:id/upvote', upvoteComplaint);
-router.patch('/:id/status', updateStatus);
+// router.get('/', getComplaints);
+// router.patch('/:id/upvote', upvoteComplaint);
+// router.patch('/:id/status', updateStatus);
 
 module.exports = router;
