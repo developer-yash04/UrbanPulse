@@ -50,27 +50,7 @@ npm run dev
 
 Server will run at `http://localhost:3000`
 
-## API Endpoints
 
-- `GET /api/reports` - Get all reports (query: ?status=Submitted|In Progress|Resolved|all)
-- `GET /api/reports/:id` - Get single report by ID
-- `POST /api/reports` - Create new report (multipart/form-data)
-- `PATCH /api/reports/:id/status` - Update report status
-- `DELETE /api/reports/:id` - Delete report
-
-## Frontend Integration
-
-The frontend uses `api.js` to communicate with the backend. Make sure the backend is running before opening the frontend pages.
-
-## Project Structure
-
-```
-backend/
-├── prisma/
-│   ├── schema.prisma    # Database schema
-│   └── seed.js          # Seed data
-├── uploads/             # Uploaded photos
-├── server.js            # Express server
 ├── package.json
 └── .env                 # Environment variables
 ```
