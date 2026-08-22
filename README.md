@@ -51,6 +51,3 @@ npm run dev
 Server will run at `http://localhost:3000`
 
 
-├── package.json
-└── .env                 # Environment variables
-```
