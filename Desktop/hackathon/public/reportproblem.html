@@ -23,7 +23,7 @@
   	<div class="upload-layout">
 
   		<section class="upload-card">
-  			<form id="report-form" novalidate>
+  			<form action="http://localhost:5000/api/complaints" method="POST" enctype="multipart/form-data">
                 <!-- Photo Upload -->
                 <div class="form-group">
 
@@ -32,7 +32,7 @@
                     <label class="upload-area" for="photo">
 
                         <strong>Upload a supporting photo</strong>
-					<input id="photo" type="file" accept="image/*">
+					<input id="photo" name="photo" type="file" accept="image/*">
 
                     </label>
 
@@ -45,7 +45,7 @@
                         Problem Type
                     </label>
 
-                    <select
+                    <select id="problem-type" name="category" class="form-control" required>
                         id="problem-type"
                         class="form-control"
                         required>
@@ -82,7 +82,7 @@
 
                         <label>
                             <input
-                                type="radio"
+                                <input type="radio" name="priority" value="Low" checked>
                                 name="priority"
                                 checked>
                             Low
@@ -90,14 +90,14 @@
 
                         <label>
                             <input
-                                type="radio"
+                                <input type="radio" name="priority" value="Medium">
                                 name="priority">
                             Medium
                         </label>
 
                         <label>
                             <input
-                                type="radio"
+                                <input type="radio" name="priority" value="High">
                                 name="priority">
                             High
                         </label>
@@ -113,7 +113,7 @@
                         Description
                     </label>
 
-                    <textarea
+                    <textarea class="form-control" id="description" name="description"
                         class="form-control"
                         id="description"
                         placeholder="Describe what you observed and how it affects the area."
@@ -160,8 +160,8 @@
    		  	
 	</div>
  </main>
- <script src="auth.js"></script>
- <script src="api.js"></script>
- <script src="reportproblem.js"></script>
+<!-- <script src="auth.js"></script> -->
+<!-- <script src="api.js"></script> -->
+<!-- <script src="reportproblem.js"></script> -->
 </body>
 </html>

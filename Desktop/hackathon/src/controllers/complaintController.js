@@ -33,7 +33,7 @@ const createComplaint = async (req, res) => {
       .from('complaints')
       .insert([
         {
-          user_id: user_id || 'anonymous',
+          user_id: user_id || '00000000-0000-0000-0000-000000000000',
           description,
           category,
           priority,
@@ -56,4 +56,22 @@ const createComplaint = async (req, res) => {
   }
 };
 
-module.exports = { createComplaint };
+const getComplaints = async (req, res) => {
+  try {
+    // Fetch all complaints from Supabase, newest first
+    const { data, error } = await supabase
+      .from('complaints')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    // Send the array of data back to the frontend
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    console.error('Error fetching complaints:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch complaints' });
+  }
+};
+
+module.exports = { createComplaint, getComplaints };

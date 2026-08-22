@@ -3,9 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const complaintRoutes = require('./routes/complaintRoutes');
 const path = require('path');
-app.use(express.static(path.join(__dirname, '../public')));
 
 const app = express();
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Middleware
 app.use(cors());
