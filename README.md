@@ -5,20 +5,6 @@
 ### 1. Install MySQL
 Make sure MySQL is installed and running on your system.
 
-### 2. Configure Database
-Edit `backend/.env` with your MySQL credentials:
-```env
-DATABASE_URL="mysql://username:password@localhost:3306/urbanpulse"
-PORT=3000
-NODE_ENV=development
-```
-
-### 3. Create Database
-```bash
-mysql -u root -p
-CREATE DATABASE urbanpulse;
-EXIT;
-```
 
 ### 4. Install Dependencies
 ```bash
